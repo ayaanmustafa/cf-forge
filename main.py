@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from cf_service import fetch_all_problems
 import os
+from sqlalchemy import text
 
 app = FastAPI()
 
@@ -72,7 +73,7 @@ def health_check():
     try:
         # Try to connect to the database
         db = SessionLocal()
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
         db.close()
         return {
             "status": "healthy",

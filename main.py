@@ -26,6 +26,9 @@ frontend_url = os.getenv("FRONTEND_URL")
 if frontend_url:
     allowed_origins.append(frontend_url)
 
+# Allow any Vercel deployment for now (can restrict later)
+allowed_origins.append("https://*.vercel.app")
+
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,

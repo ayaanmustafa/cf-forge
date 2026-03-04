@@ -65,6 +65,27 @@ class TrackUnsolvdProblemRequest(BaseModel):
 def root():
     return {"message": "CF Forge Backend Running"}
 
+@app.get("/health")
+def health_check():
+    """Health check endpoint with database connectivity verification"""
+    try:
+        # Try to connect to the database
+        db = SessionLocal()
+        db.execute("SELECT 1")
+        db.close()
+        return {
+            "status": "healthy",
+            "service": "CF Forge Backend",
+            "database": "connected"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "service": "CF Forge Backend",
+            "database": "disconnected",
+            "error": str(e)
+        }, 503
+
 @app.post("/bucket")
 def create_bucket(request: CreateBucketRequest):
     db: Session = SessionLocal()

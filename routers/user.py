@@ -175,8 +175,10 @@ def add_note(
 # GET TAGS FOR USER
 @router.get("/tags/{handle}")
 def get_tags(handle: str, db: Session = Depends(get_db)):
-    user = get_or_create_user(db, handle)
-    
+    user = db.query(User).filter(User.cf_handle == handle).first()
+
+    if not user:
+        return [] 
     return [
         {
             "id": tag.id,

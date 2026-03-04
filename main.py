@@ -75,13 +75,10 @@ def root():
     return {"message": "CF Forge Backend Running"}
 
 @app.get("/health")
-def health_check():
+def health_check(db: Session = Depends(get_db)):
     """Health check endpoint with database connectivity verification"""
     try:
-        # Try to connect to the database
-        db = SessionLocal()
         db.execute(text("SELECT 1"))
-        db.close()
         return {
             "status": "healthy",
             "service": "CF Forge Backend",
@@ -96,8 +93,7 @@ def health_check():
         }, 503
 
 @app.post("/bucket")
-def create_bucket(request: CreateBucketRequest):
-    db: Session = SessionLocal()
+def create_bucket(request: CreateBucketRequest, db: Session = Depends(get_db)):
 
     user = db.query(User).filter(User.cf_handle == request.handle).first()
     if not user:
@@ -114,8 +110,7 @@ def create_bucket(request: CreateBucketRequest):
     }
 
 @app.post("/bucket/{bucket_id}/add")
-def add_problem_to_bucket(bucket_id: int, request: AddProblemToBucketRequest):
-    db: Session = SessionLocal()
+def add_problem_to_bucket(bucket_id: int, request: AddProblemToBucketRequest, db: Session = Depends(get_db)):
 
     bucket = db.query(Bucket).filter(Bucket.id == bucket_id).first()
     if not bucket:
@@ -145,8 +140,7 @@ def add_problem_to_bucket(bucket_id: int, request: AddProblemToBucketRequest):
     return {"message": "Problem added"}
 
 @app.get("/bucket/{handle}")
-def get_buckets(handle: str):
-    db: Session = SessionLocal()
+def get_buckets(handle: str, db: Session = Depends(get_db)):
 
     user = db.query(User).filter(User.cf_handle == handle).first()
     if not user:
@@ -195,8 +189,7 @@ def get_buckets(handle: str):
     return result
 
 @app.get("/bucket/view/{bucket_id}")
-def view_bucket(bucket_id: int):
-    db: Session = SessionLocal()
+def view_bucket(bucket_id: int, db: Session = Depends(get_db)):
 
     bucket = db.query(Bucket).filter(Bucket.id == bucket_id).first()
     if not bucket:
@@ -244,8 +237,7 @@ def view_bucket(bucket_id: int):
     return results
 
 @app.post("/problem/add")
-def add_problem(request: AddProblemRequest):
-    db: Session = SessionLocal()
+def add_problem(request: AddProblemRequest, db: Session = Depends(get_db)):
 
     existing = db.query(Problem).filter(
         Problem.contest_id == request.contest_id,
@@ -269,8 +261,7 @@ def add_problem(request: AddProblemRequest):
     return {"problem_id": problem.id}
 
 @app.delete("/bucket/{bucket_id}/remove/{problem_id}")
-def remove_problem_from_bucket(bucket_id: int, problem_id: int):
-    db: Session = SessionLocal()
+def remove_problem_from_bucket(bucket_id: int, problem_id: int, db: Session = Depends(get_db)):
 
     bucket_problem = db.query(BucketProblem).filter(
         BucketProblem.bucket_id == bucket_id,
@@ -286,8 +277,7 @@ def remove_problem_from_bucket(bucket_id: int, problem_id: int):
     return {"message": "Problem removed"}
 
 @app.put("/bucket/{bucket_id}/rename")
-def rename_bucket(bucket_id: int, request: RenameBucketRequest):
-    db: Session = SessionLocal()
+def rename_bucket(bucket_id: int, request: RenameBucketRequest, db: Session = Depends(get_db)):
 
     bucket = db.query(Bucket).filter(Bucket.id == bucket_id).first()
     if not bucket:
@@ -299,8 +289,7 @@ def rename_bucket(bucket_id: int, request: RenameBucketRequest):
     return {"message": "Bucket renamed"}
 
 @app.delete("/bucket/{bucket_id}")
-def delete_bucket(bucket_id: int):
-    db: Session = SessionLocal()
+def delete_bucket(bucket_id: int, db: Session = Depends(get_db)):
 
     bucket = db.query(Bucket).filter(Bucket.id == bucket_id).first()
     if not bucket:
@@ -312,8 +301,7 @@ def delete_bucket(bucket_id: int):
     return {"message": "Bucket deleted"}
 
 @app.get("/bucket/{bucket_id}/stats")
-def bucket_stats(bucket_id: int):
-    db: Session = SessionLocal()
+def bucket_stats(bucket_id: int, db: Session = Depends(get_db)):
 
     bucket = db.query(Bucket).filter(Bucket.id == bucket_id).first()
     if not bucket:
@@ -389,9 +377,8 @@ def search_all_problems(min_rating: int = 800, max_rating: int = 3500, contest_i
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/problem/track")
-def track_unsolved_problem(request: TrackUnsolvdProblemRequest):
+def track_unsolved_problem(request: TrackUnsolvdProblemRequest, db: Session = Depends(get_db)):
     """Add an unsolved problem to user's database for tracking"""
-    db: Session = SessionLocal()
 
     # Get or create user
     user = db.query(User).filter(User.cf_handle == request.handle).first()

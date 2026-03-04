@@ -14,12 +14,11 @@ app = FastAPI()
 
 # CORS configuration - allow localhost for development and production frontend
 allowed_origins = [
-    "https://cf-forge-frontend.vercel.app/",
+    "https://cf-forge-frontend.vercel.app",
     "http://localhost:5173",
     "http://localhost:3000",
     "http://localhost:5174",
-    "http://localhost:5175",
-    "http://localhost:5176"
+    "http://localhost:5175"
 ]
 
 # Add production frontend URLs from environment if provided

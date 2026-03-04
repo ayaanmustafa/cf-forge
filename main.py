@@ -1,11 +1,11 @@
 from database import engine, SessionLocal
 from models import Base, User, Bucket, BucketProblem, Problem, SolvedProblem
 from routers import user
-from fastapi import HTTPException, FastAPI
+from fastapi import HTTPException, FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, text
 from cf_service import fetch_all_problems
 import os
 from sqlalchemy import text
@@ -36,6 +36,14 @@ app.add_middleware(
 )
 
 Base.metadata.create_all(bind=engine)
+
+# Dependency to get database session - auto closes after request
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 app.include_router(user.router)
 

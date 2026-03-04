@@ -17,7 +17,11 @@ if DATABASE_URL.startswith("postgres://"):
 
 engine = create_engine(
     DATABASE_URL,
-    pool_pre_ping=True,  # Enable connection pooling health checks
+    pool_pre_ping=True,           # Health check before using connection
+    pool_size=5,                   # Connections to keep in pool
+    max_overflow=5,                # Additional connections beyond pool_size
+    pool_recycle=3600,             # Recycle connections after 1 hour
+    pool_timeout=30,               # Wait up to 30 seconds for a connection
     echo=False
 )
 

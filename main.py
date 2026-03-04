@@ -18,6 +18,7 @@ allowed_origins = [
     "http://localhost:5174",
     "http://localhost:5175",
     "http://localhost:5176",
+    "https://cf-forge-frontend.vercel.app/"
 ]
 
 # Add production frontend URLs from environment if provided
